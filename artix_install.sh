@@ -11,6 +11,7 @@
 #	- add wlan support (currently only working with ethernet)
 #	- choose init system (might only work on arch, not artix)
 #	- choose kernel to install (might only work on arch, not artix)
+#	- think about initial procedure to run this script (curl..), add instructions
 
 
 # References:
@@ -19,6 +20,7 @@
 #	- https://github.com/Zaechus/artix-installer/blob/main/src/installer.sh
 #	- https://gitlab.com/FabseGP02/artix-install-script/-/blob/main/scripts/functions.sh?ref_type=heads
 #	- https://github.com/classy-giraffe/easy-arch/blob/main/easy-arch.sh#L121
+#	- https://unix.stackexchange.com/questions/466599/how-to-re-run-the-case-statement-if-the-input-is-invalid
 
 
 ## Load Keymap (temporarly)
@@ -37,14 +39,13 @@ loadkeys de_CH-latin1
 
 
 ### Check Boot Mode ###
-[ ! -d /sys/firmware/efi ] && printf ""
 
 if [ ! -d /sys/firmware/efi ]; then
-	printf "BIOS System detected"
-	
+	SYSTEM = "BIOS"
 else
-	prinf "UEFI System detected"
+	SYSTEM = "UEFI"
 fi	
+printf "%s System detected\n" "$SYSTEM"				## print system variable, needs to be rechecked
 
 
 
@@ -122,34 +123,10 @@ fi
 
 
 
-
-
-
-
-
-
-
-
-
-
 ### Format Drive(s) and Create Partitions ###
 
 # Choosing disk for the installation.
-print "Available disks for the installation:"
-PS3="Please select the number of the corresponding disk (e.g. 1): "				## check why PS3
-select ENTRY in $(lsblk -dpnoNAME|grep -P "/dev/sd|nvme|vd");					## check what this does, for understanding, $-> variable?
-do
-    DISK="$ENTRY"																
-    info_print "Artix Linux will be installed on the following disk: $DISK"
-    break
-done
-
-
-
-
-
-
-
+lsblk 										## print avaiable drives
 
 
 
@@ -158,8 +135,11 @@ done
 
 ## Partitioning
 
-# Create Boot Partition
+# Create Boot Partition (BIOS for now, UEFI in later step)
 # Format as FAT32
+
+
+
 
 
 # Create Encrypted LUKS Home Partition
