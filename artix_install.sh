@@ -1,5 +1,4 @@
-#!/bin/sh -e
-
+#!/usr/bin/env bash
 
 # Basic Artix Install Script
 
@@ -21,7 +20,26 @@
 #	- https://gitlab.com/FabseGP02/artix-install-script/-/blob/main/scripts/functions.sh?ref_type=heads
 #	- https://github.com/classy-giraffe/easy-arch/blob/main/easy-arch.sh#L121
 #	- https://unix.stackexchange.com/questions/466599/how-to-re-run-the-case-statement-if-the-input-is-invalid
+# 	- https://github.com/whoisYoges/magic-arch-installer/blob/master/legacy-base-install.sh
 
+
+# Information
+# - This script needs some linux coreutils to work. It does not work without a kernel.
+
+
+
+
+
+
+
+## Part 1: Working outside the Installation
+echo "Start of the Installation"
+sleep 3s
+
+
+## Set Time
+echo "Ensuring system clock is accurate."
+timedatectl set-ntp true				## check command
 
 ## Load Keymap (temporarly)
 
@@ -30,6 +48,8 @@
 
 # load wished keymap
 loadkeys de_CH-latin1
+echo "keymap de_CH-latin1 set"
+sleep 2s
 
 
 ## Choose Init System
@@ -39,13 +59,13 @@ loadkeys de_CH-latin1
 
 
 ### Check Boot Mode ###
-
+echo "Checking boot mode"
 if [ ! -d /sys/firmware/efi ]; then
 	SYSTEM = "BIOS"
 else
 	SYSTEM = "UEFI"
 fi	
-printf "%s System detected\n" "$SYSTEM"				## print system variable, needs to be rechecked
+printf "%s System detected\n" "$SYSTEM"				## print system variable, needs to be checked
 
 
 
@@ -126,19 +146,20 @@ fi
 ### Format Drive(s) and Create Partitions ###
 
 # Choosing disk for the installation.
-lsblk 										## print avaiable drives
-
-
-
-
+lsblk 													##  lsblk lists information about all available or the specified block devices.
+echo "input drive on which the OS shall be installed."
+read drive												## read user input --> implement error check in a further step
+sleep 2s
 
 
 ## Partitioning
+echo "creating partition table"
+fdisk "$drive"											## run fdisk for specified drive
+lsblk
+
 
 # Create Boot Partition (BIOS for now, UEFI in later step)
 # Format as FAT32
-
-
 
 
 
@@ -148,3 +169,10 @@ lsblk 										## print avaiable drives
 
 
 ## Mount the Partitions
+
+
+
+
+
+
+## Part 2: Working in the Installation
